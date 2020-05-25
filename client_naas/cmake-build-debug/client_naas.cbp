@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="client_naas"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/pet/CLionProjects/client_naas/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/pet/CLionProjects/client_naas/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/pet/CLionProjects/client_naas/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="client_naas">
+				<Option output="/home/pet/CLionProjects/client_naas/cmake-build-debug/client_naas" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pet/CLionProjects/client_naas/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 client_naas"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="client_naas/fast">
+				<Option output="/home/pet/CLionProjects/client_naas/cmake-build-debug/client_naas" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/pet/CLionProjects/client_naas/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 client_naas/fast"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/pet/CLionProjects/client_naas/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/pet/CLionProjects/client_naas/include/daemonize.h">
+			<Option target="client_naas"/>
+		</Unit>
+		<Unit filename="/home/pet/CLionProjects/client_naas/include/log.h">
+			<Option target="client_naas"/>
+		</Unit>
+		<Unit filename="/home/pet/CLionProjects/client_naas/include/msg.h">
+			<Option target="client_naas"/>
+		</Unit>
+		<Unit filename="/home/pet/CLionProjects/client_naas/include/tun.h">
+			<Option target="client_naas"/>
+		</Unit>
+		<Unit filename="/home/pet/CLionProjects/client_naas/src/daemonize.c">
+			<Option target="client_naas"/>
+		</Unit>
+		<Unit filename="/home/pet/CLionProjects/client_naas/src/log.c">
+			<Option target="client_naas"/>
+		</Unit>
+		<Unit filename="/home/pet/CLionProjects/client_naas/src/main.c">
+			<Option target="client_naas"/>
+		</Unit>
+		<Unit filename="/home/pet/CLionProjects/client_naas/src/msg.c">
+			<Option target="client_naas"/>
+		</Unit>
+		<Unit filename="/home/pet/CLionProjects/client_naas/src/tun.c">
+			<Option target="client_naas"/>
+		</Unit>
+		<Unit filename="/home/pet/CLionProjects/client_naas/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

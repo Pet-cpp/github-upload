@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/client_naas.dir/src/main.c.o CMakeFiles/client_naas.dir/src/tun.c.o CMakeFiles/client_naas.dir/src/daemonize.c.o CMakeFiles/client_naas.dir/src/msg.c.o CMakeFiles/client_naas.dir/src/log.c.o  -o client_naas 
