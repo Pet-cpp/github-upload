@@ -56,20 +56,6 @@ void tun_up(char *tun_name) {
 }
 
 void set_route(char *ip, char *tun_name) {
-   /* int j = 0;
-    for (int i = 0; i < 19; ++i) {
-        if (ip[i] == '.') {
-            j++;
-            if (j == 3) {
-                ip[i+1] = '0';
-                ip[i+2] = '/';
-                ip[i+3] = '2';
-                ip[i+4] = '4';
-                ip[i+5] = '\0';
-                break;
-            }
-        }
-    }*/
     pid_t p = fork();
     if (p == 0) {
         execlp("ip", "ip", "route", "add", ip, "dev", tun_name, NULL);

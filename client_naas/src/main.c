@@ -108,6 +108,7 @@ int main(int argc, char *argv[]) {
     if (connect(net_fd, (struct sockaddr*) &remote, sizeof(remote)) < 0) {
         close_connection(tun_fd, net_fd);
         log_error(log, "Error connecting to the server: ip - %s, port - %d", remote_ip, port);
+        my_err("Error connecting to the server: ip - %s, port - %d", remote_ip, port);
         return -1;
     }
 
@@ -115,8 +116,11 @@ int main(int argc, char *argv[]) {
         char error_buf[1024];
         strerror_r(errno, error_buf, 1024);
         log_error(log, "Writing data to the network (net_name): %s", error_buf);
+        my_err("The network %s does not exist or there are no available addresses in network %s\n", net_name, net_name);
         return -1;
     }
+    log_info(log, "Connected to the network - %s", net_name);
+    my_err("Connected to the network - %s", net_name);
 
     Send_ip get_ip;
     if((nread = read(net_fd, &get_ip, sizeof(get_ip))) < 0) {
@@ -134,6 +138,7 @@ int main(int argc, char *argv[]) {
     tun_up(if_name);
     log_info(log, "%s - The tun interface is up", if_name);
 
+    ///костыль
     struct in_addr ip_r_send;
     ip_r_send.s_addr = get_ip.ip;
     char ip_net_mask[19] = "";
@@ -142,11 +147,11 @@ int main(int argc, char *argv[]) {
     char str[5];
     sprintf(str, "%d", get_ip.netmask_send);
     strcat(ip_net_mask, str);
-
-    my_err("can't open log file -- %s\n", ip_net_mask);
+    // конец
+    //my_err("can't open log file -- %s\n", ip_net_mask);
 
     set_route(ip_net_mask, if_name);
-    my_err("can't open log file -- %s\n", ip_net_mask);
+    //my_err("can't open log file -- %s\n", ip_net_mask);
 
     log_info(log, "%s dev %s - Route created", client_ip, if_name);
 

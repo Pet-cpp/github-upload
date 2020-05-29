@@ -52,3 +52,23 @@ netinet/in.h
 ../include/log.h
 /home/pet/CLionProjects/client_naas/include/log.h
 
+/home/pet/CLionProjects/client_naas/src/tun.c
+stdio.h
+-
+string.h
+-
+unistd.h
+-
+net/if.h
+-
+linux/if_tun.h
+-
+sys/ioctl.h
+-
+fcntl.h
+-
+sys/wait.h
+-
+../include/tun.h
+/home/pet/CLionProjects/client_naas/include/tun.h
+
