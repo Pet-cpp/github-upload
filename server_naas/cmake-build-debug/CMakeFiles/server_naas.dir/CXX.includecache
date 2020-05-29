@@ -29,6 +29,8 @@ cstdlib
 -
 cstdarg
 -
+cmath
+-
 arpa/inet.h
 -
 stdlib.h

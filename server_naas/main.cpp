@@ -9,6 +9,7 @@
 #include <set>
 #include <cstdlib>
 #include <cstdarg>
+#include <cmath>
 
 #include <arpa/inet.h>
 #include <stdlib.h>
@@ -26,7 +27,19 @@
 const int BUFSIZE = 65536;
 const int PORT = 55555;
 const int IP_ADDR_NEXT = 16777216;
+char *prog_name;
 
+void usage() {
+    fprintf(stderr, "Usage:\n");
+    fprintf(stderr, "%s [-c </path/to/config/file>] [-a <serverIP>] [-p <port>]\n", prog_name);
+    fprintf(stderr, "%s -h\n", prog_name);
+    fprintf(stderr, "\n");
+    fprintf(stderr, "-c </path/to/congig/file>: Path to the configuration file (mandatory)\n");
+    fprintf(stderr, "-a <serverIP>: specify server address (-c <serverIP>) (mandatory)\n");
+    fprintf(stderr, "-p <port>: port to connect, default 55555\n");
+    fprintf(stderr, "-h: prints this help text\n");
+    exit(1);
+}
 
 typedef struct {
    u_char ip_vhl;      /* version << 4 | header length >> 2 */
@@ -113,12 +126,19 @@ typedef struct {
 }Send_ip;
 
 typedef struct {
+    int sock;
+    std::string name;
+}Sock_and_name;
+
+typedef struct {
     char address_ip[16];
     unsigned int addr_ip_4b;
     int netmask;
     int count_route;
     std::vector<std::string> net_route;
     in_addr last_ip;
+    int count_client;
+    std::vector<unsigned int> free_addr;
 }My_route;
 
 class Route {
@@ -137,6 +157,8 @@ public:
             }
             inet_aton(temp_rout.address_ip, &temp_rout.last_ip);
             temp_rout.addr_ip_4b = temp_rout.last_ip.s_addr;
+            temp_rout.count_client = 0;
+            temp_rout.free_addr.clear();
             rout.insert(std::make_pair(net_name, temp_rout));
         }
         vpn.clear();
@@ -152,11 +174,22 @@ public:
         }
 
         auto it = rout.find(buf_net_name);
+        if (it->second.count_client == pow(2, 32 - it->second.netmask) - 2) {
+            close(sock_client);
+            return -1;
+        }
+
         if (it != rout.end()) {
             Send_ip temp_send_ip;
             temp_send_ip.ip = it->second.addr_ip_4b;
-            temp_send_ip.ip_client = it->second.last_ip.s_addr + IP_ADDR_NEXT;
-            it->second.last_ip.s_addr = temp_send_ip.ip_client;
+            if (!it->second.free_addr.empty()) {
+                temp_send_ip.ip_client = it->second.free_addr[0];
+                it->second.free_addr.erase(it->second.free_addr.begin());
+            } else {
+                temp_send_ip.ip_client = it->second.last_ip.s_addr + IP_ADDR_NEXT;
+                it->second.last_ip.s_addr = temp_send_ip.ip_client;
+            }
+
             temp_send_ip.netmask_send = it->second.netmask;
             temp_send_ip.count_route = it->second.count_route;
 
@@ -173,16 +206,27 @@ public:
                     return -1;
                 }
             }
-
-            vpn.insert(std::make_pair(temp_send_ip.ip_client, sock_client));
+            it->second.count_client += 1;
+            Sock_and_name temp_sock_name;
+            temp_sock_name.sock = sock_client;
+            temp_sock_name.name = it->first;
+            vpn.insert(std::make_pair(temp_send_ip.ip_client, temp_sock_name));
         }
         return 0;
     }
 
     int max_fd() {
-        return std::max_element(vpn.begin(), vpn.end(), [](const std::pair<unsigned int, int> A, const std::pair<unsigned int, int> B) {
-            return  A.second < B.second;
-        })->second;
+        return std::max_element(vpn.begin(), vpn.end(), [](const std::pair<unsigned int, Sock_and_name> A, const std::pair<unsigned int, Sock_and_name> B) {
+            return  A.second.sock < B.second.sock;
+        })->second.sock;
+    }
+
+    void disconnect(std::string net_name, unsigned int ip) {
+        auto it = rout.find(net_name);
+        if (it != rout.end()) {
+            it->second.count_client -= 1;
+            it->second.free_addr.push_back(ip);
+        }
     }
 
     void cout_route() {
@@ -196,7 +240,7 @@ public:
         }
     }
 
-    std::map<unsigned int, int> vpn;
+    std::map<unsigned int, Sock_and_name> vpn;
 private:
     std::map<std::string, My_route> rout;
 };
@@ -211,7 +255,9 @@ int main(int argc, char *argv[]) {
     const char *path_to_conf;
     unsigned short int port = PORT;
 
-    while((option = getopt(argc, argv, "a:p:c:")) > 0) {
+    prog_name = argv[0];
+
+    while((option = getopt(argc, argv, "a:p:c:h")) > 0) {
         switch(option) {
             case 'c': {
                 path_to_conf = optarg;
@@ -225,8 +271,13 @@ int main(int argc, char *argv[]) {
                 port = atoi(optarg);
                 break;
             }
+            case 'h': {
+                usage();
+                break;
+            }
             default:
                 my_err("Unknown option %c\n", option);
+                usage();
         }
     }
 
@@ -276,7 +327,7 @@ int main(int argc, char *argv[]) {
         FD_SET(listener, &readset);
 
         for(auto it = vpn_net_route.vpn.begin(); it != vpn_net_route.vpn.end(); it++) {
-            FD_SET(it->second, &readset);
+            FD_SET(it->second.sock, &readset);
         }
 
         // Çàäà¸ì òàéìàóò
@@ -311,13 +362,14 @@ int main(int argc, char *argv[]) {
         }
 
         for(auto it = vpn_net_route.vpn.begin(); it != vpn_net_route.vpn.end(); it++) {
-            if(FD_ISSET(it->second, &readset)) {
+            if(FD_ISSET(it->second.sock, &readset)) {
                 // Ïîñòóïèëè äàííûå îò êëèåíòà, ÷èòàåì èõ
-                bytes_read = read(it->second, buf, BUFSIZE);
+                bytes_read = read(it->second.sock, buf, BUFSIZE);
 
                 if (bytes_read <= 0) {
                     // Ñîåäèíåíèå ðàçîðâàíî, óäàëÿåì ñîêåò èç ìíîæåñòâà
-                    close(it->second);
+                    close(it->second.sock);
+                    vpn_net_route.disconnect(it->second.name, it->first);
                     vpn_net_route.vpn.erase(it);
                     continue;
                 }
@@ -329,8 +381,8 @@ int main(int argc, char *argv[]) {
                 //printf("src = %u.%u.%u.%u\n", packet->header.ip_src.s_addr & 0xFF, (packet->header.ip_src.s_addr & 0xFF00) >> 8, (packet->header.ip_src.s_addr & 0xFF0000) >> 16, (packet->header.ip_src.s_addr & 0xFF000000) >> 24);
                 auto it = vpn_net_route.vpn.find(packet->header.ip_dst.s_addr);
                 if (it != vpn_net_route.vpn.end()) {
-                    std::cout << it->second << std::endl;
-                    write(it->second, buf, bytes_read);
+                    // std::cout << it->second << std::endl;
+                    write(it->second.sock, buf, bytes_read);
                 }
                 free(packet);
 
