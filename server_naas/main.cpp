@@ -26,7 +26,7 @@
 
 const int BUFSIZE = 65536;
 const int PORT = 55555;
-const int IP_ADDR_NEXT = 16777216;
+const int IP_ADDR_NEXT = 16777216; // <- sо bad
 char *prog_name;
 
 void usage() {
@@ -62,53 +62,7 @@ typedef struct {
     char data[65515];
 } IPPacket;
 
-class Network {
-public:
-    explicit Network(const char* vpn_ip_1, std::string  vpn_net_name_1 = "vpn1") :
-    vpn_net_name_1(std::move((vpn_net_name_1)))
-    {
-        inet_aton(vpn_ip_1, &vpn_net_ip_1);
-        vpn1.clear();
-        last_ip = vpn_net_ip_1;
-    }
 
-    int max_fd() {
-        return std::max_element(vpn1.begin(), vpn1.end(), [](const std::pair<unsigned int, int> A, const std::pair<unsigned int, int> B) {
-            return  A.second < B.second;
-        })->second;
-    }
-
-    void set_ip(int sock_client) {
-        i++;
-
-
-        in_addr new_ip = last_ip;
-        new_ip.s_addr += IP_ADDR_NEXT;
-        write(sock_client, &new_ip, sizeof(new_ip));
-        last_ip = new_ip;
-        if (i==2) {
-            std::cout << "new_ip " << last_ip.s_addr << std::endl;
-            new_ip.s_addr = 939194967;
-        }
-        vpn1.insert(std::pair<unsigned int, int>(new_ip.s_addr, sock_client));
-    }
-
-    void send_packet(int sock_client, char *buf) {
-        IPPacket *packet;
-        packet = (IPPacket *)malloc(sizeof(IPPacket));
-        memcpy(packet, (char *)&buf, sizeof(IPPacket));
-        //printf("dst = %u.%u.%u.%u\n", packet->header.dest & 0xFF, (packet->header.dest & 0xFF00) >> 8, (packet->header.dest & 0xFF0000) >> 16, (packet->header.dest & 0xFF000000) >> 24);
-
-    }
-
-    std::map<unsigned int, int> vpn1;
-private:
-    int i = 0;
-    in_addr vpn_net_ip_1{};
-    std::string vpn_net_name_1;
-    in_addr last_ip{};
-
-};
 
 void my_err(char *msg, ...) {
     va_list argp;
@@ -288,8 +242,6 @@ int main(int argc, char *argv[]) {
     }
 
     Route vpn_net_route(fp);
-    //vpn_net.cout_route();
-    //while (1) {};
 
     listener = socket(AF_INET, SOCK_STREAM, 0);
     if (listener < 0) {
@@ -317,11 +269,11 @@ int main(int argc, char *argv[]) {
     }
 
 
-    //Network net("8.8.8.0");
+
 
 
     while (true) {
-        // Çàïîëíÿåì ìíîæåñòâî ñîêåòîâ
+
         fd_set readset;
         FD_ZERO(&readset);
         FD_SET(listener, &readset);
@@ -330,12 +282,7 @@ int main(int argc, char *argv[]) {
             FD_SET(it->second.sock, &readset);
         }
 
-        // Çàäà¸ì òàéìàóò
-       // timeval timeout;
-        //timeout.tv_sec = 15;
-       // timeout.tv_usec = 0;
 
-        // Æä¸ì ñîáûòèÿ â îäíîì èç ñîêåòîâ
         int mx = std::max(listener, vpn_net_route.max_fd());
         int ret = select(mx+1, &readset, NULL, NULL, NULL);
 
@@ -348,10 +295,10 @@ int main(int argc, char *argv[]) {
             exit(3);
         }
 
-        // Îïðåäåëÿåì òèï ñîáûòèÿ è âûïîëíÿåì ñîîòâåòñòâóþùèå äåéñòâèÿ
+
         if(FD_ISSET(listener, &readset)) {
 
-            // Ïîñòóïèë íîâûé çàïðîñ íà ñîåäèíåíèå, èñïîëüçóåì accept
+
             int sock = accept(listener, NULL, NULL);
             if(sock < 0) {
                 perror("accept");
@@ -363,11 +310,11 @@ int main(int argc, char *argv[]) {
 
         for(auto it = vpn_net_route.vpn.begin(); it != vpn_net_route.vpn.end(); it++) {
             if(FD_ISSET(it->second.sock, &readset)) {
-                // Ïîñòóïèëè äàííûå îò êëèåíòà, ÷èòàåì èõ
+
                 bytes_read = read(it->second.sock, buf, BUFSIZE);
 
                 if (bytes_read <= 0) {
-                    // Ñîåäèíåíèå ðàçîðâàíî, óäàëÿåì ñîêåò èç ìíîæåñòâà
+
                     close(it->second.sock);
                     vpn_net_route.disconnect(it->second.name, it->first);
                     vpn_net_route.vpn.erase(it);
@@ -377,8 +324,10 @@ int main(int argc, char *argv[]) {
                 IPPacket *packet;
                 packet = (IPPacket *)malloc(sizeof(IPPacket));
                 memcpy(packet, (char *)&buf, sizeof(IPPacket));
+                //printf("-------------------\n");
                 printf("dst = %u.%u.%u.%u\n", packet->header.ip_dst.s_addr & 0xFF, (packet->header.ip_dst.s_addr & 0xFF00) >> 8, (packet->header.ip_dst.s_addr & 0xFF0000) >> 16, (packet->header.ip_dst.s_addr & 0xFF000000) >> 24);
-                //printf("src = %u.%u.%u.%u\n", packet->header.ip_src.s_addr & 0xFF, (packet->header.ip_src.s_addr & 0xFF00) >> 8, (packet->header.ip_src.s_addr & 0xFF0000) >> 16, (packet->header.ip_src.s_addr & 0xFF000000) >> 24);
+                printf("src = %u.%u.%u.%u\n", packet->header.ip_src.s_addr & 0xFF, (packet->header.ip_src.s_addr & 0xFF00) >> 8, (packet->header.ip_src.s_addr & 0xFF0000) >> 16, (packet->header.ip_src.s_addr & 0xFF000000) >> 24);
+                printf("---------------------\n");
                 auto it = vpn_net_route.vpn.find(packet->header.ip_dst.s_addr);
                 if (it != vpn_net_route.vpn.end()) {
                     // std::cout << it->second << std::endl;
@@ -386,8 +335,6 @@ int main(int argc, char *argv[]) {
                 }
                 free(packet);
 
-                // Îòïðàâëÿåì äàííûå îáðàòíî êëèåíòó
-                //send(*it, buf, bytes_read, 0);
             }
         }
     }
